@@ -136,11 +136,12 @@ textarea {
 
 textarea {
   margin: 5% 37%;
+  margin: 5% auto;
 }
 
 #submit {
-  margin: 5% 40%;
-  display: block;
+    margin: 0 auto;
+      display: block;
 }
 
 
@@ -176,18 +177,18 @@ textarea {
 
   .biobox {
     width: 98%;
-
+    margin: 0 auto;
   }
 
   form {
     width: 90%;
     height: 500px;
-    margin: 0 5%;
+    margin: 0 auto;
     border: 2px solid white;
   }
 
   textarea {
-    margin-left: 20%;
+    margin: 0 auto;
   }
 
   #submit {
