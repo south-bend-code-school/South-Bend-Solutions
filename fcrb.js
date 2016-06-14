@@ -1,60 +1,74 @@
-Parse.$ = jQuery;
+'use strict';
 
-Parse.initialize('QCZ62TDrKVsBjD3r8wwxzChHtDRJDZrCxcQ7hj1s',
-'Q2fiAfBb5ZTFTYmrKRD1gxPbEYIjrGWJKSRKdmrU');
+//var allPostsSection = document.getElementById('all-posts-list');
+var postCounter = 0;
+/**
+ * Creates a post element.
+ */
 
-$(function() {
 
-  $(document).ready(init);
-    // Ensure that each todo created has `content`.
-  function init() {
-    var Story = Parse.Object.extend("Story");
-    var query = new Parse.Query(Story);
-    query.descending("createdAt");
-    //query.equalTo("playerName", "Dan Stemkoski");
-    query.find({
-      success: function(results) {
-        //alert("Successfully retrieved " + results.length + " scores.");
-        // Do something with the returned Parse.Object values
-        for (var i = 0; i < results.length; i++) {
-          var object = results[i];
-          var photoURL = object.get("photo").url();
-          var html =  '<div class="biobox">' +
-                      '<div class="image" style="background-image: url('+photoURL+')""></div>' +
-                      '<div class="description">' +
-                      '<h2>' + object.get('name') + '</h2>' +
-                      '<p>Age Range:' + object.get('agerange') + '</p>' +
-                      '<p>' + object.get('comments') + '</p>' +
-                      '</div>' +
-                      '</div>';
+function createPostElement(name, age, story, picPath) {
 
-          $("#bios").append(html);
-        }
-      },
-      error: function(error) {
-        alert("Error: " + error.code + " " + error.message);
-      }
+    console.log("Creating Post");
+    postCounter = postCounter + 1;
+    var leftRight = "containright";
+    if(postCounter % 2) {
+      leftRight = "containleft";
+    }
+
+  var html =
+        '<br>'+ '<br>'+ '<div class="'+leftRight+'">' +
+        '<img src= "'+picPath+'"width="250" >'   +
+        '<div class="name">'+name+'</div>' +
+        '<div class="agerange">'+age+'</div>' +
+        '<div class="comments">'+story+'</div>' +
+     '</div>';
+
+  $('#bios').prepend(html);
+
+  // // Create the DOM element from the HTML.
+  // var div = document.createElement('div');
+  // div.innerHTML = html;
+  // var postElement = div.firstChild;
+  //
+  // // Set values.
+  // postElement.getElementsByClassName('name')[0].innerText = "Pet Name: " + petName;
+  // postElement.getElementsByClassName('email')[0].innerText = "Email: " + email;
+
+  // return postElement;
+}
+
+/**
+ * Starts listening for new posts and populates posts lists.
+ */
+function startDatabaseQueries() {
+    console.log("Starting database query");
+  // Get all posts
+  var allPostsRef = firebase.database().ref('posts/');
+
+  var fetchPosts = function(postsRef) {
+    console.log("Fetching Data");
+    postsRef.on('child_added', function(data) {
+        console.log(data.val());
+        createPostElement(data.val().name,
+                          data.val().age,
+                          data.val().story,
+                          data.val().picPath);
+
+
+      // var containerElement = sectionElement.getElementsByClassName('results')[0];
+      // containerElement.insertBefore(
+      //     createPostElement(data.val().petName, data.val().email, data.val().firstName + data.val().lastName, data.val().picPath),
+      //     containerElement.firstChild);
+    console.log("Done inserting");
     });
-    //$('#submit').on('click', closeIncident);
-  }
-});
+  };
 
-//   function closeIncident() {
-//   ALL OF THIS NEEDS TO CHANGE TO CLOSE AN INCIDENT.
-//     var incident = new Parse.Object('Incident');
-//     var issue = $('#issue').val();
-//     var location = $('#location').val();
-//     var issuetype = $('input:radio:checked').attr('id');
-//     incident.set('issue', issue);
-//     incident.set('location', location);
-//     incident.set('issuetype', issuetype);
-//     incident.save(null, {
-//       success: function(incident){
-//         window.location.replace('home.html');
-//       },
-//       error: function(tag, error){
-//         alert('Sorry, there was an error saving your incident.');
-//       }
-//     });
-//   }
-// });
+  fetchPosts(allPostsRef);
+}
+
+// Bindings on load.
+window.addEventListener('load', function() {
+    // Listen for auth state changes
+    startDatabaseQueries();
+}, false);
